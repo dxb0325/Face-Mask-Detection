@@ -12,6 +12,10 @@ import imutils
 import time
 import cv2
 import os
+import datetime
+from pymongo import MongoClient
+import pickle
+# import pafy
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
@@ -102,6 +106,19 @@ print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
+'''
+if youtube video
+url = "https://youtu.be/yDnhz-AXknY"
+video = pafy.new(url)
+best = video.getbest(preftype="mp4")
+vs = cv2.VideoCapture(best.url)
+time.sleep(2.0)
+'''
+
+client = MongoClient('localhost',27017)
+db = client.detect_no_mask
+col = db.no_mask_collection
+
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
@@ -127,6 +144,19 @@ while True:
 			
 		# include the probability in the label
 		label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+
+		# save db
+		if label == "No Mask":
+			no_mask_people = {'date':datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S"),
+		    'frame':pickle.dumps(frame)
+			}
+			col.insert_one(no_mask_people)
+
+			'''
+			# save png
+			now = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
+			cv2.imwrite("D:/capture/" + str(now) + ".png", frame)
+			'''
 
 		# display the label and bounding box rectangle on the output
 		# frame
