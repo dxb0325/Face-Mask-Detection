@@ -11,7 +11,7 @@ import detect_mask_image
 # Setting custom Page Title and Icon with changed layout and sidebar state
 st.beta_set_page_config(page_title='Face Mask Detector', page_icon='😷', layout='centered', initial_sidebar_state='expanded')
 
-
+#Joy here
 def local_css(file_name):
     """ Method for reading styles.css and applying necessary changes to HTML"""
     with open(file_name) as f:
